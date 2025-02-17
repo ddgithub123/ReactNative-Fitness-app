@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { FIREBASE_AUTH } from './FirebaseConfig';
@@ -8,9 +9,13 @@ import Toast from 'react-native-toast-message';
 import Login from './app/screens/Login';
 import SignUp from './app/screens/signUp';
 import List from './app/screens/List';
+import Profile from './app/screens/Profile';
+import Activity from './app/screens/Activity';
+import Leaderboard from './app/screens/Leaderboard';
 import Details from './app/screens/Details';
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -27,15 +32,24 @@ export default function App() {
     }, []);
 
     if (loading) {
-        return null; // Prevents flickering while checking auth state
+        return null;
     }
+
+    const TabNavigator = () => (
+        <Tab.Navigator>
+            <Tab.Screen name="Home" component={List} />
+            <Tab.Screen name="Profile" component={Profile} />
+            <Tab.Screen name="Activity" component={Activity} />
+            <Tab.Screen name="Leaderboard" component={Leaderboard} />
+        </Tab.Navigator>
+    );
 
     return (
         <>
             <NavigationContainer>
-                <Stack.Navigator initialRouteName={user ? 'Home' : 'Login'}>
+                <Stack.Navigator initialRouteName={user ? 'TabNavigator' : 'Login'}>
                     {user ? (
-                        <Stack.Screen name="Home" component={List} options={{ headerShown: true }} />
+                        <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false }} />
                     ) : (
                         <>
                             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
